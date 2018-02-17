@@ -9,6 +9,8 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var buffer = require('vinyl-buffer');
 
+var ghPages = require('gulp-gh-pages');
+
 var paths = {
     pages: ['src/*.html']
 };
@@ -37,6 +39,11 @@ gulp.task("copy-lib", function () {
         .pipe(gulp.dest(destination + '/lib'));
 });
 
+gulp.task('deploy', function() {
+    return gulp.src(gulp.dest(destination + '/**/*'))
+        .pipe(ghPages());
+});
+
 function bundleWatch() {
     return watchedBrowserify
         .bundle()
@@ -44,7 +51,7 @@ function bundleWatch() {
         .pipe(gulp.dest(destination));
 }
 
-function bundleDeploy() {
+function bundleUglify() {
     return browserify({
         basedir: '.',
         debug: debug,
@@ -63,7 +70,8 @@ function bundleDeploy() {
 }
 
 gulp.task("default", ["copy-html", "copy-lib"], bundleWatch);
-gulp.task("deploy", ["copy-html", "copy-lib"], bundleDeploy);
+gulp.task("uglify", ["copy-html", "copy-lib"], bundleUglify);
+gulp.task("deploy", ["deploy"]);
 
 watchedBrowserify.on("update", bundleWatch);
 watchedBrowserify.on("log", gutil.log);
