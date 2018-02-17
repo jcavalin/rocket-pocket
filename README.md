@@ -2,5 +2,5 @@
 
 A Phaser.js project.
 
-##Run
+## Run
 gulp
