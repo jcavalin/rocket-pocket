@@ -12,7 +12,9 @@ var buffer = require('vinyl-buffer');
 var ghPages = require('gulp-gh-pages');
 
 var paths = {
-    pages: ['src/*.html']
+    pages: ['src/*.html'],
+    imgs: ['src/img/*'],
+    audios: ['src/audio/*']
 };
 
 var destination = 'dist';
@@ -32,6 +34,16 @@ var watchedBrowserify = watchify(browserify({
 gulp.task("copy-html", function () {
     return gulp.src(paths.pages)
         .pipe(gulp.dest(destination));
+});
+
+gulp.task("copy-img", function () {
+    return gulp.src(paths.imgs)
+        .pipe(gulp.dest(destination + '/img'));
+});
+
+gulp.task("copy-audio", function () {
+    return gulp.src(paths.audios)
+        .pipe(gulp.dest(destination + '/audio'));
 });
 
 gulp.task("copy-lib", function () {
@@ -59,19 +71,19 @@ function bundleUglify() {
         cache: {},
         packageCache: {}
     })
-        .plugin(tsify)
+        // .plugin(tsify)
         .bundle()
         .pipe(source('bundle.js'))
-        .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
+        // .pipe(buffer())
+        // .pipe(sourcemaps.init({loadMaps: true}))
+        // .pipe(uglify())
+        // .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest(destination));
 }
 
-gulp.task("default", ["copy-html", "copy-lib"], bundleWatch);
-gulp.task("uglify", ["copy-html", "copy-lib"], bundleUglify);
-gulp.task("deploy", ["copy-html", "copy-lib", "deploy"]);
+gulp.task("default", ["copy-html", "copy-lib", "copy-img", "copy-audio"], bundleWatch);
+gulp.task("uglify", ["copy-html", "copy-lib", "copy-img", "copy-audio"], bundleUglify);
+gulp.task("deploy", ["copy-html", "copy-lib", "copy-img", "copy-audio", "deploy"]);
 
 watchedBrowserify.on("update", bundleWatch);
 watchedBrowserify.on("log", gutil.log);
