@@ -6,6 +6,9 @@ class RocketPocketGame {
     fuel: number;
     fuelText: Phaser.Text;
     background: Phaser.TileSprite;
+    ground: Phaser.Polygon;
+    graphics: Phaser.Graphics;
+    playingSound: boolean;
 
     constructor() {
         this.game = new Phaser.Game(800, 512, Phaser.AUTO, 'content', {
@@ -17,7 +20,8 @@ class RocketPocketGame {
     }
 
     preload() {
-        this.fuel = 300;
+        this.fuel = 1300;
+        this.playingSound = false;
         this.game.load.spritesheet('rocket', 'img/rocket.png', 50, 75, 3);
         this.game.load.image('background', 'img/lunar-background.png');
         this.game.load.audio('rocket-audio', ['audio/rocket-launch.wav']);
@@ -32,28 +36,54 @@ class RocketPocketGame {
         this.game.world.setBounds(0, 0, 2000, 1512);
         this.game.camera.y = 1512;
 
-        this.rocket = this.game.add.sprite(32, 1512, 'rocket');
-        this.rocket.animations.add('launching', [1, 2, 3], 10, true);
-        this.game.physics.enable( [ this.rocket ], Phaser.Physics.ARCADE);
-
-        this.rocketAudio = this.game.add.audio('rocket-audio');
+        this.rocketAudio = this.game.add.audio('rocket-audio', 1, true);
         this.rocketAudio.allowMultiple = false;
         this.rocketAudio.addMarker('launching', 0, 10);
 
-        this.rocket.body.velocity.setTo(0, 200);
-        this.rocket.body.collideWorldBounds = true;
-
         this.cursors = this.game.input.keyboard.createCursorKeys();
-
-        this.rocket.body.bounce.set(0);
-        this.rocket.body.gravity.set(0, 180);
 
         this.fuelText = this.game.add.text(32, 32, 'Combustível: ' + this.fuel, { font: "20px Arial", fill: "#ffffff", align: "left" });
         this.fuelText.fixedToCamera = true;
         this.fuelText.cameraOffset.setTo(32, 32);
 
+        let highPoint = -100;
+        let lowerPoint = 200;
+        let groundPoints = [
+            new Phaser.Point(0, lowerPoint),
+            new Phaser.Point(0, 180), // área de pouso inicial
+            new Phaser.Point(100, 180)  // área de pouso inicial
+        ];
+
+        for(let xPoint = 150; xPoint < 1750; xPoint += 50) {
+            groundPoints.push(new Phaser.Point(xPoint, (Math.random() * lowerPoint)  + highPoint));
+        }
+
+        groundPoints.push(new Phaser.Point(1800, 180)); // área de pouso final
+        groundPoints.push(new Phaser.Point(1900, 180)); // área de pouso final
+
+        groundPoints.push(new Phaser.Point(1950, (Math.random() * lowerPoint)  + highPoint));
+        groundPoints.push(new Phaser.Point(2000, (Math.random() * lowerPoint)  + highPoint));
+        groundPoints.push(new Phaser.Point(2100, 200));
+
+        console.log(groundPoints);
+        this.ground = new Phaser.Polygon();
+        this.ground.setTo(groundPoints);
+
+        this.graphics = this.game.add.graphics(0, 1312);
+        this.graphics.beginFill(0x8e8e8e);
+        this.graphics.drawPolygon(this.ground.points);
+        this.graphics.endFill();
+
+        this.rocket = this.game.add.sprite(32, 1512, 'rocket');
+        this.rocket.animations.add('launching', [1, 2, 3], 10, true);
+        this.game.physics.enable( [ this.rocket ], Phaser.Physics.ARCADE);
+        this.rocket.body.bounce.set(0);
+        this.rocket.body.gravity.set(0, 180);
+        this.rocket.body.velocity.setTo(0, 200);
+        this.rocket.body.collideWorldBounds = true;
+
         this.game.camera.follow(this.rocket);
-        this.game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300);
+        this.game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 0);
         this.game.camera.focusOnXY(0, 0);
     }
 
@@ -66,29 +96,39 @@ class RocketPocketGame {
             return fuel;
         };
 
+        let playRocketSound = function (playingSound, rocketAudio) {
+            if(!playingSound){
+                rocketAudio.play('launching');
+                playingSound = true
+            }
+
+            return playingSound;
+        };
+
         if (this.cursors.up.isDown && this.fuel > 0) {
             this.rocket.body.acceleration.y = -600;
-            this.rocket.animations.play('launching');
 
-            this.rocketAudio.play('launching');
+            this.rocket.animations.play('launching');
+            this.playingSound = playRocketSound(this.playingSound, this.rocketAudio)
             this.fuel = consumeFuel(this.fuel);
         } else if (this.cursors.left.isDown && this.fuel > 0) {
-            this.rocket.body.acceleration.x = -100;
+            this.rocket.body.acceleration.x = -400;
             this.rocket.animations.play('launching');
 
-            this.rocketAudio.play('launching');
+            this.playingSound = playRocketSound(this.playingSound, this.rocketAudio)
             this.fuel = consumeFuel(this.fuel);
         } else if (this.cursors.right.isDown && this.fuel > 0) {
-            this.rocket.body.acceleration.x = 100;
+            this.rocket.body.acceleration.x = 400;
             this.rocket.animations.play('launching');
 
-            this.rocketAudio.play('launching');
+            this.playingSound = playRocketSound(this.playingSound, this.rocketAudio)
             this.fuel = consumeFuel(this.fuel);
         } else {
             this.rocket.body.acceleration.setTo(0,0);
             this.rocket.frame = 0;
             this.rocket.animations.stop();
             this.rocketAudio.stop();
+            this.playingSound = false;
         }
 
         if(this.rocket.body.onFloor()){
