@@ -17,6 +17,17 @@
   },
   "homepage": "https://github.com/jcavalin/rocket-pocket#readme",
   "devDependencies": {
-    "phaser-ce": "^2.10.0"
+    "browserify": "^16.1.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^4.0.1",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "phaser-ce": "^2.10.0",
+    "tsify": "^3.0.4",
+    "typescript": "^2.7.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0",
+    "watchify": "^3.10.0"
   }
 }
