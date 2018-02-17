@@ -1,0 +1,22 @@
+{
+  "name": "rocket-pocket",
+  "version": "0.0.1",
+  "description": "A Phaser.js project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcavalin/rocket-pocket.git"
+  },
+  "author": "Julio Cavalin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcavalin/rocket-pocket/issues"
+  },
+  "homepage": "https://github.com/jcavalin/rocket-pocket#readme",
+  "devDependencies": {
+    "phaser-ce": "^2.10.0"
+  }
+}
