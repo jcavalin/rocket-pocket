@@ -71,7 +71,7 @@ function bundleUglify() {
 
 gulp.task("default", ["copy-html", "copy-lib"], bundleWatch);
 gulp.task("uglify", ["copy-html", "copy-lib"], bundleUglify);
-gulp.task("deploy", ["deploy"]);
+gulp.task("deploy", ["copy-html", "copy-lib", "deploy"]);
 
 watchedBrowserify.on("update", bundleWatch);
 watchedBrowserify.on("log", gutil.log);
