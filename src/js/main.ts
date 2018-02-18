@@ -3,6 +3,7 @@ class RocketPocketGame {
     fuel: number = 500;
     accelerationX: number = 200;
     accelerationY: number = 400;
+    fuelLabel: string = 'Fuel';
 
     playingSound: boolean = false;
     exploded: boolean = false;
@@ -52,7 +53,7 @@ class RocketPocketGame {
         this.rocketExplosion.allowMultiple = false;
         this.rocketExplosion.addMarker('exploding', 0, 10);
 
-        this.fuelText = this.game.add.text(32, 32, 'Combustível: ' + this.fuel, {
+        this.fuelText = this.game.add.text(32, 32, this.fuelLabel + ': ' + this.fuel, {
             font: "20px Arial",
             fill: "#ffffff",
             align: "left"
@@ -98,20 +99,20 @@ class RocketPocketGame {
     }
 
     drawGround() {
-        let highPoint = 50;
+        let highPoint = 100;
         let lowerPoint = 450;
         let groundPoints = [
             new Phaser.Point(0, 600),
-            new Phaser.Point(0, 580), // área de pouso inicial
-            new Phaser.Point(100, 580)  // área de pouso inicial
+            new Phaser.Point(0, 580), // landing
+            new Phaser.Point(100, 580)  // landing
         ];
 
         for (let xPoint = 150; xPoint < 1750; xPoint += 50) {
             groundPoints.push(new Phaser.Point(xPoint, (Math.random() * lowerPoint) + highPoint));
         }
 
-        groundPoints.push(new Phaser.Point(1800, 580)); // área de pouso final
-        groundPoints.push(new Phaser.Point(1900, 580)); // área de pouso final
+        groundPoints.push(new Phaser.Point(1800, 580)); // landing
+        groundPoints.push(new Phaser.Point(1900, 580)); // landing
 
         groundPoints.push(new Phaser.Point(1950, (Math.random() * lowerPoint) + highPoint));
         groundPoints.push(new Phaser.Point(2000, (Math.random() * lowerPoint) + highPoint));
@@ -179,7 +180,7 @@ class RocketPocketGame {
             this.rocket.body.velocity.x = 0;
         }
 
-        this.fuelText.text = 'Combustível: ' + this.fuel;
+        this.fuelText.text = this.fuelLabel + ': ' + this.fuel;
         this.background.tilePosition.x = -this.game.camera.x;
         this.background.tilePosition.y = -this.game.camera.y;
     }
