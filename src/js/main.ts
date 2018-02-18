@@ -17,8 +17,6 @@ class RocketPocketGame {
     background: Phaser.TileSprite;
     ground: Phaser.Polygon;
     graphics: Phaser.Graphics;
-    pad: Phaser.VirtualJoystick;
-    stick: Phaser.Gamepad;
 
     constructor() {
         this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'content', {
@@ -35,7 +33,6 @@ class RocketPocketGame {
         this.game.load.image('background', 'img/lunar-background.png');
         this.game.load.audio('rocket-audio', ['audio/rocket-launch.mp3']);
         this.game.load.audio('rocket-explosion', ['audio/rocket-explosion.mp3']);
-        this.game.load.atlas('dpad', 'img/dpad.png', 'img/dpad.json');
     }
 
     create() {
@@ -84,10 +81,6 @@ class RocketPocketGame {
         this.game.camera.follow(this.rocket);
         this.game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 0);
         this.game.camera.focusOnXY(0, 0);
-
-        // this.pad = this.game.plugins.add(Phaser.VirtualJoystick);
-        // this.stick = this.pad.addDPad(0, 0, 200, 'dpad');
-        // this.stick.alignBottomLeft(0);
     }
 
     update() {
