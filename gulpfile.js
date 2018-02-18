@@ -52,8 +52,8 @@ gulp.task("copy-lib", function () {
 });
 
 gulp.task('deploy', function() {
-    return gulp.src(gulp.dest(destination + '/**/*'))
-        .pipe(ghPages());
+    return gulp.src("./" + destination + "/**/*")
+        .pipe(deploy())
 });
 
 function bundleWatch() {
