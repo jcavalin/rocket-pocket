@@ -57,7 +57,7 @@ class RocketPocketGame {
         this.fuelText.fixedToCamera = true;
         this.fuelText.cameraOffset.setTo(32, 32);
 
-        let highPoint = 100;
+        let highPoint = 50;
         let lowerPoint = 450;
         let groundPoints = [
             new Phaser.Point(0, 600),
@@ -86,6 +86,7 @@ class RocketPocketGame {
 
         this.rocket = this.game.add.sprite(32, 1512, 'rocket');
         this.rocket.animations.add('launching', [1, 2, 3], 10, true);
+        this.rocket.anchor = new Phaser.Point(0.5, 0.5);
         this.game.physics.enable( [ this.rocket ], Phaser.Physics.ARCADE);
 
         this.rocket.body.bounce.set(0);
@@ -127,6 +128,7 @@ class RocketPocketGame {
             this.rocket.body.velocity.y = 0;
 
             this.explosion = this.game.add.sprite(this.rocket.x, this.rocket.y, 'explosion');
+            this.explosion.anchor = new Phaser.Point(0.5, 0.5);
             this.explosion.animations.add('exploding',
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
             this.explosion.animations.play('exploding', 10, false, true);
@@ -175,8 +177,8 @@ class RocketPocketGame {
     }
 
     render() {
-        // this.game.debug.bodyInfo(this.rocket, 32, 32);
-        // this.game.debug.body(this.rocket);
+        this.game.debug.bodyInfo(this.rocket, 32, 32);
+        this.game.debug.body(this.rocket);
     }
 }
 
