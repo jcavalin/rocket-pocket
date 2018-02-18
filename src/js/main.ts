@@ -17,6 +17,7 @@ class RocketPocketGame {
     background: Phaser.TileSprite;
     ground: Phaser.Polygon;
     graphics: Phaser.Graphics;
+    introText: Phaser.Text;
 
     constructor() {
         this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'content', {
@@ -81,6 +82,18 @@ class RocketPocketGame {
         this.game.camera.follow(this.rocket);
         this.game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 0);
         this.game.camera.focusOnXY(0, 0);
+
+        this.explosion = this.game.add.sprite(0, 0, 'explosion');
+        this.explosion.anchor = new Phaser.Point(0.5, 0.5);
+        this.explosion.animations.add('exploding',
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
+        this.explosion.visible = false;
+
+        this.introText = this.game.add.text(400, this.game.world.centerY, 'Teste',
+            { font: "40px Arial", fill: "#ffffff", align: "center" });
+        this.introText.anchor = new Phaser.Point(0.5, 0.5);
+        this.introText.fixedToCamera = true;
+        this.introText.visible = false;
     }
 
     update() {
@@ -150,14 +163,6 @@ class RocketPocketGame {
         this.consumeFuel();
     }
 
-    setUpExplosionSprite() {
-        this.explosion = this.game.add.sprite(this.rocket.x, this.rocket.y, 'explosion');
-        this.explosion.anchor = new Phaser.Point(0.5, 0.5);
-        this.explosion.animations.add('exploding',
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
-
-    }
-
     moving() {
         if (this.cursors.up.isDown && !this.isFuelEmpty()) {
             this.rocket.body.acceleration.y = -this.accelerationY;
@@ -190,13 +195,23 @@ class RocketPocketGame {
         this.rocket.body.velocity.x = 0;
         this.rocket.body.velocity.y = 0;
 
-        this.setUpExplosionSprite();
+        this.explosion.x = this.rocket.x;
+        this.explosion.y = this.rocket.y;
+        this.explosion.visible = true;
+
         this.explosion.animations.play('exploding', 10, false, true);
 
         this.game.world.remove(this.rocket);
         this.rocketAudio.stop();
 
         this.rocketExplosion.play('exploding');
+
+        this.gameOver();
+    }
+
+    gameOver() {
+        this.introText.text = 'Game Over!';
+        this.introText.visible = true;
     }
 }
 
