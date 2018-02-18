@@ -1,9 +1,11 @@
 class RocketPocketGame {
     debug: boolean = false;
+    fuel: number = 500;
+    accelerationX: number = 200;
+    accelerationY: number = 400;
+
     playingSound: boolean = false;
     exploded: boolean = false;
-    fuel: number = 500;
-
     game: Phaser.Game;
     cursors: Phaser.CursorKeys;
     rocket: Phaser.Sprite;
@@ -41,7 +43,6 @@ class RocketPocketGame {
         this.background = this.game.add.tileSprite(0, 0, 800, 600, 'background');
         this.background.fixedToCamera = true;
         this.game.world.setBounds(0, 0, 2000, 600);
-        this.game.camera.y = 1512;
 
         this.rocketAudio = this.game.add.audio('rocket-audio', 1, true);
         this.rocketAudio.allowMultiple = false;
@@ -83,46 +84,9 @@ class RocketPocketGame {
 
     update() {
         if (this.checkExplosion() && !this.exploded) {
-            this.exploded = true;
-            this.rocket.body.velocity.x = 0;
-            this.rocket.body.velocity.y = 0;
-
-            this.explosion = this.game.add.sprite(this.rocket.x, this.rocket.y, 'explosion');
-            this.explosion.anchor = new Phaser.Point(0.5, 0.5);
-            this.explosion.animations.add('exploding',
-                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
-            this.explosion.animations.play('exploding', 10, false, true);
-
-            this.game.world.remove(this.rocket);
-            this.rocketAudio.stop();
-
-            this.rocket.visible = false;
-            this.rocketExplosion.play('exploding');
+            this.exploding();
         } else if (!this.exploded) {
-            if (this.cursors.up.isDown && !this.isFuelEmpty()) {
-                this.rocket.body.acceleration.y = -400;
-                this.launching();
-            } else if (this.cursors.left.isDown && !this.isFuelEmpty()) {
-                this.rocket.body.acceleration.x = -200;
-                this.launching();
-            } else if (this.cursors.right.isDown && !this.isFuelEmpty()) {
-                this.rocket.body.acceleration.x = 200;
-                this.launching();
-            } else {
-                this.rocket.body.acceleration.setTo(0, 0);
-                this.rocket.frame = 0;
-                this.rocket.animations.stop();
-                this.rocketAudio.stop();
-                this.playingSound = false;
-            }
-
-            if (this.rocket.body.onFloor()) {
-                this.rocket.body.velocity.x = 0;
-            }
-
-            this.fuelText.text = 'Combustível: ' + this.fuel;
-            this.background.tilePosition.x = -this.game.camera.x;
-            this.background.tilePosition.y = -this.game.camera.y;
+            this.moving();
         }
     }
 
@@ -183,6 +147,55 @@ class RocketPocketGame {
         this.rocket.animations.play('launching');
         this.playRocketSound();
         this.consumeFuel();
+    }
+
+    setUpExplosionSprite() {
+        this.explosion = this.game.add.sprite(this.rocket.x, this.rocket.y, 'explosion');
+        this.explosion.anchor = new Phaser.Point(0.5, 0.5);
+        this.explosion.animations.add('exploding',
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
+
+    }
+
+    moving() {
+        if (this.cursors.up.isDown && !this.isFuelEmpty()) {
+            this.rocket.body.acceleration.y = -this.accelerationY;
+            this.launching();
+        } else if (this.cursors.left.isDown && !this.isFuelEmpty()) {
+            this.rocket.body.acceleration.x = -this.accelerationX;
+            this.launching();
+        } else if (this.cursors.right.isDown && !this.isFuelEmpty()) {
+            this.rocket.body.acceleration.x = this.accelerationX;
+            this.launching();
+        } else {
+            this.rocket.body.acceleration.setTo(0, 0);
+            this.rocket.frame = 0;
+            this.rocket.animations.stop();
+            this.rocketAudio.stop();
+            this.playingSound = false;
+        }
+
+        if (this.rocket.body.onFloor()) {
+            this.rocket.body.velocity.x = 0;
+        }
+
+        this.fuelText.text = 'Combustível: ' + this.fuel;
+        this.background.tilePosition.x = -this.game.camera.x;
+        this.background.tilePosition.y = -this.game.camera.y;
+    }
+
+    exploding() {
+        this.exploded = true;
+        this.rocket.body.velocity.x = 0;
+        this.rocket.body.velocity.y = 0;
+
+        this.setUpExplosionSprite();
+        this.explosion.animations.play('exploding', 10, false, true);
+
+        this.game.world.remove(this.rocket);
+        this.rocketAudio.stop();
+
+        this.rocketExplosion.play('exploding');
     }
 }
 
