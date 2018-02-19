@@ -69,14 +69,13 @@ class RocketPocketGame {
         this.fuelText.fixedToCamera = true;
         this.fuelText.cameraOffset.setTo(32, 32);
 
-        this.drawGround();
-
         this.graphics = this.game.add.graphics(0, 0);
+        this.drawGround();
         this.graphics.beginFill(0x8e8e8e);
         this.graphics.drawPolygon(this.ground.points);
         this.graphics.endFill();
 
-        this.rocket = this.game.add.sprite(32, 1512, 'rocket');
+        this.rocket = this.game.add.sprite(50, 1512, 'rocket');
         this.rocket.animations.add('launching', [1, 2, 3], 10, true);
         this.rocket.anchor = new Phaser.Point(0.5, 0.5);
         this.game.physics.enable([this.rocket], Phaser.Physics.ARCADE);
@@ -97,7 +96,7 @@ class RocketPocketGame {
         this.explosion.visible = false;
 
         this.introText = this.game.add.text(400, this.game.world.centerY, '',
-            { font: "40px Arial", fill: "#ffffff", align: "center" });
+            {font: "40px Arial", fill: "#ffffff", align: "center"});
         this.introText.anchor = new Phaser.Point(0.5, 0.5);
         this.introText.fixedToCamera = true;
         this.introText.visible = false;
@@ -111,12 +110,11 @@ class RocketPocketGame {
     update() {
         if (!this.ended && this.checkExplosion()) {
             this.exploding();
-        } else if(!this.ended && this.checkVictory()) {
+        } else if (!this.ended && this.checkVictory()) {
             this.victory();
         } else if (!this.ended) {
             this.moving();
         }
-
     }
 
     render() {
@@ -131,9 +129,16 @@ class RocketPocketGame {
         let lowerPoint = 450;
         let groundPoints = [
             new Phaser.Point(0, 600),
-            new Phaser.Point(0, 580), // landing
-            new Phaser.Point(100, 580)  // landing
+            new Phaser.Point(0, 580), // launch
+            new Phaser.Point(100, 580)  // launch
         ];
+
+        let lineLaunch = new Phaser.Line(0, 585, 100, 585);
+        let graphicsLaunch = this.game.add.graphics(0, 0);
+        graphicsLaunch.lineStyle(10, 0xffd900, 1);
+        graphicsLaunch.moveTo(lineLaunch.start.x, lineLaunch.start.y);
+        graphicsLaunch.lineTo(lineLaunch.end.x, lineLaunch.end.y);
+        graphicsLaunch.endFill();
 
         for (let xPoint = 150; xPoint < 1750; xPoint += 50) {
             groundPoints.push(new Phaser.Point(xPoint, (Math.random() * lowerPoint) + highPoint));
@@ -141,6 +146,13 @@ class RocketPocketGame {
 
         groundPoints.push(new Phaser.Point(1800, 580)); // landing
         groundPoints.push(new Phaser.Point(1900, 580)); // landing
+
+        let lineLanding = new Phaser.Line(1800, 585, 1900, 585);
+        let graphicsLanding = this.game.add.graphics(0, 0);
+        graphicsLanding.lineStyle(10, 0xE43A45, 1);
+        graphicsLanding.moveTo(lineLanding.start.x, lineLanding.start.y);
+        graphicsLanding.lineTo(lineLanding.end.x, lineLanding.end.y);
+        graphicsLanding.endFill();
 
         groundPoints.push(new Phaser.Point(1950, (Math.random() * lowerPoint) + highPoint));
         groundPoints.push(new Phaser.Point(2000, (Math.random() * lowerPoint) + highPoint));
