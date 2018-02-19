@@ -3,11 +3,13 @@ class RocketPocketGame {
     accelerationX: number = 200;
     accelerationY: number = 400;
     fuelDefault: number = 500;
-    fuelLabel: string = 'Fuel';
+    fuelLabel: string = 'Combustível';
+    gameOverLabel: string = 'Você perdeu!';
+    victoryLabel: string = 'Você conseguiu!';
 
     fuel: number = this.fuelDefault;
     playingSound: boolean = false;
-    exploded: boolean = false;
+    ended: boolean = false;
     game: Phaser.Game;
     cursors: Phaser.CursorKeys;
     rocket: Phaser.Sprite;
@@ -91,7 +93,7 @@ class RocketPocketGame {
         this.explosion = this.game.add.sprite(0, 0, 'explosion');
         this.explosion.anchor = new Phaser.Point(0.5, 0.5);
         this.explosion.animations.add('exploding',
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
+            Array.apply(null, {length: 23}).map(Number.call, Number), 10, false);
         this.explosion.visible = false;
 
         this.introText = this.game.add.text(400, this.game.world.centerY, '',
@@ -107,11 +109,14 @@ class RocketPocketGame {
     }
 
     update() {
-        if (this.checkExplosion() && !this.exploded) {
+        if (!this.ended && this.checkExplosion()) {
             this.exploding();
-        } else if (!this.exploded) {
+        } else if(!this.ended && this.checkVictory()) {
+            this.victory();
+        } else if (!this.ended) {
             this.moving();
         }
+
     }
 
     render() {
@@ -161,11 +166,16 @@ class RocketPocketGame {
     checkExplosion() {
         return this.ground.contains(this.rocket.x, this.rocket.y)
             || (this.rocket.body.onFloor() && this.rocket.body.speed > 203)
-    };
+    }
+
+    checkVictory() {
+        return !this.ended && this.rocket.body.onFloor()
+            && this.rocket.x > 1800 && this.rocket.x < 1900
+    }
 
     isFuelEmpty() {
         return this.fuel === 0;
-    };
+    }
 
     launching() {
         this.rocket.animations.play('launching');
@@ -200,10 +210,14 @@ class RocketPocketGame {
         this.background.tilePosition.y = -this.game.camera.y;
     }
 
-    exploding() {
-        this.exploded = true;
+    freeze() {
+        this.ended = true;
         this.rocket.body.velocity.x = 0;
         this.rocket.body.velocity.y = 0;
+    }
+
+    exploding() {
+        this.freeze();
 
         this.explosion.x = this.rocket.x;
         this.explosion.y = this.rocket.y;
@@ -220,19 +234,25 @@ class RocketPocketGame {
     }
 
     gameOver() {
-        this.introText.text = 'Game Over!';
+        this.introText.text = this.gameOverLabel;
+        this.introText.visible = true;
+        this.restartButton.visible = true;
+    }
+
+    victory() {
+        this.freeze();
+
+        this.introText.text = this.victoryLabel;
         this.introText.visible = true;
         this.restartButton.visible = true;
     }
 
     restart() {
         this.fuel = this.fuelDefault;
-        this.exploded = false;
-        this.exploded = false;
+        this.ended = false;
 
         this.game.state.restart();
     }
-
 }
 
 window.onload = () => {
