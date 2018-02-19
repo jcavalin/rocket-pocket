@@ -1,10 +1,11 @@
 class RocketPocketGame {
     debug: boolean = false;
-    fuel: number = 500;
     accelerationX: number = 200;
     accelerationY: number = 400;
+    fuelDefault: number = 500;
     fuelLabel: string = 'Fuel';
 
+    fuel: number = this.fuelDefault;
     playingSound: boolean = false;
     exploded: boolean = false;
     game: Phaser.Game;
@@ -18,6 +19,7 @@ class RocketPocketGame {
     ground: Phaser.Polygon;
     graphics: Phaser.Graphics;
     introText: Phaser.Text;
+    restartButton: Phaser.Button;
 
     constructor() {
         this.game = new Phaser.Game(800, 600, Phaser.AUTO, 'content', {
@@ -31,7 +33,10 @@ class RocketPocketGame {
     preload() {
         this.game.load.spritesheet('rocket', 'img/rocket.png', 50, 75, 3);
         this.game.load.spritesheet('explosion', 'img/explosion.png', 64, 64, 23);
+        this.game.load.spritesheet('restart-button', 'img/restart-button.png', 96, 40);
+
         this.game.load.image('background', 'img/lunar-background.png');
+
         this.game.load.audio('rocket-audio', ['audio/rocket-launch.mp3']);
         this.game.load.audio('rocket-explosion', ['audio/rocket-explosion.mp3']);
     }
@@ -89,11 +94,16 @@ class RocketPocketGame {
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 10, false);
         this.explosion.visible = false;
 
-        this.introText = this.game.add.text(400, this.game.world.centerY, 'Teste',
+        this.introText = this.game.add.text(400, this.game.world.centerY, '',
             { font: "40px Arial", fill: "#ffffff", align: "center" });
         this.introText.anchor = new Phaser.Point(0.5, 0.5);
         this.introText.fixedToCamera = true;
         this.introText.visible = false;
+
+        this.restartButton = this.game.add.button(400, this.game.world.centerY + 50, 'restart-button', this.restart, this, 2, 1, 0);
+        this.restartButton.anchor = new Phaser.Point(0.5, 0.5);
+        this.restartButton.fixedToCamera = true;
+        this.restartButton.visible = false;
     }
 
     update() {
@@ -212,7 +222,17 @@ class RocketPocketGame {
     gameOver() {
         this.introText.text = 'Game Over!';
         this.introText.visible = true;
+        this.restartButton.visible = true;
     }
+
+    restart() {
+        this.fuel = this.fuelDefault;
+        this.exploded = false;
+        this.exploded = false;
+
+        this.game.state.restart();
+    }
+
 }
 
 window.onload = () => {
